@@ -23,16 +23,25 @@ func GetYMDHM() string {
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
 }
 
+// 20220402174258
 func GetYMDHMS() string {
 	t := time.Now()
 	return fmt.Sprintf("%d%02d%02d%02d%02d%02d",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 }
 
+// 2022年04月02日17:42:58
 func GetYMDHMS0() string {
 	t := time.Now()
 	return fmt.Sprintf("%d年%02d月%02d日%02d:%02d:%02d",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+}
+
+// 2022-04-02T17:42:58.489
+func GetYMDHMS1() string {
+	t := time.Now()
+	return fmt.Sprintf("%d-%02d-%02dT%02d:%02d:%02d.%03d",
+		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond()/1000000)
 }
 
 func TimestampToTimestring(ts int64) string {

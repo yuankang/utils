@@ -84,6 +84,26 @@ func GetFileSize(f string) (int64, error) {
 	return fi.Size(), nil
 }
 
+// XXX: ioutil.ReadAll(file) 内存的使用测试
+func TestReadAll() {
+	fp, err := os.Open("test.txt")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	b, err := ioutil.ReadAll(fp)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println(string(b)) // test
+	// 可以看到len只有4, 但是cap却有1536
+	log.Println(len(b)) // 4
+	log.Println(cap(b)) // 1536
+}
+
 func ReadAllFile(file string) ([]byte, error) {
 	fp, err := os.Open(file)
 	if err != nil {
