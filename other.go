@@ -79,7 +79,7 @@ func CheckUrl(url UrlInfo) (bool, error) {
 处理器读取外部数据的时候，必须知道数据的字节序，将其转成正确的值。然后，就正常使用这个值，完全不用再考虑字节序。
 即使是向外部设备写入数据，也不用考虑字节序，正常写入一个值即可。外部设备会自己处理字节序的问题。
 */
-func IsLittleEndian() bool {
+func IsLittleEndianBak() bool {
 	var i int32 = 0x01020304
 
 	// 下面这两句是为了将int32类型的指针转换为byte类型的指针
