@@ -7,37 +7,40 @@ import (
 	"time"
 )
 
+//2022
 func GetY() string {
 	t := time.Now()
 	return fmt.Sprintf("%d", t.Year())
 }
 
+//20220102
 func GetYMD() string {
 	t := time.Now()
 	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
 }
 
+//202201021030
 func GetYMDHM() string {
 	t := time.Now()
 	return fmt.Sprintf("%d%02d%02d%02d%02d",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
 }
 
-// 20220402174258
+//20220102103020
 func GetYMDHMS() string {
 	t := time.Now()
 	return fmt.Sprintf("%d%02d%02d%02d%02d%02d",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 }
 
-// 2022年04月02日17:42:58
+//2022年01月02日10:30:20
 func GetYMDHMS0() string {
 	t := time.Now()
 	return fmt.Sprintf("%d年%02d月%02d日%02d:%02d:%02d",
 		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 }
 
-// 2022-04-02T17:42:58.489
+//2022-01-02T10:30:20.500
 func GetYMDHMS1() string {
 	t := time.Now()
 	return fmt.Sprintf("%d-%02d-%02dT%02d:%02d:%02d.%03d",
@@ -69,7 +72,7 @@ func TimestringToTimestamp(s string) int64 {
 	return theTime.Unix()
 }
 
-//func GetNowUnix(dw string) int64 {
+//func GetNowUnix(dw string) int64 {}
 func GetTimestamp(dw string) int64 {
 	switch dw {
 	case "s":

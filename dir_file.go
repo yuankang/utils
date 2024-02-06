@@ -3,32 +3,45 @@ package utils
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-// 判断文件或者文件夹是否存在
+func GetRunPath() (string, error) {
+	rp, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	log.Println("RunPath:", rp)
+	return rp, nil
+}
+
+//判断文件或者文件夹是否存在
 func FileExist(s string) bool {
 	_, err := os.Stat(s)
 	return err == nil || os.IsExist(err)
 }
 
-// 判断文件或者文件夹是否存在, 可以指定是否创建
+//判断文件或者文件夹是否存在, 可以指定是否创建
 func DirExist(name string, isMake bool) error {
+	if FileExist(name) == true {
+		return nil
+	}
+
 	var err error
-	if FileExist(name) == false {
-		if isMake {
-			err = os.MkdirAll(name, 0755)
-			if err != nil {
-				log.Printf("create %s fail: %s", name, err.Error())
-			} else {
-				log.Printf("create %s succ", name)
-			}
-			return err
+	if isMake == true {
+		err = os.MkdirAll(name, 0755)
+		if err != nil {
+			log.Printf("create %s fail: %s", name, err.Error())
 		} else {
-			return fmt.Errorf("%s not exist", name)
+			log.Printf("create %s succ", name)
 		}
+		return err
+	} else {
+		return fmt.Errorf("%s not exist", name)
 	}
 	return err
 }
@@ -82,26 +95,6 @@ func GetFileSize(f string) (int64, error) {
 		modTime: 2018-05-06 18:52:07 +0800 CST
 	*/
 	return fi.Size(), nil
-}
-
-// XXX: ioutil.ReadAll(file) 内存的使用测试
-func TestReadAll() {
-	fp, err := os.Open("test.txt")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	b, err := ioutil.ReadAll(fp)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println(string(b)) // test
-	// 可以看到len只有4, 但是cap却有1536
-	log.Println(len(b)) // 4
-	log.Println(cap(b)) // 1536
 }
 
 func ReadAllFile(file string) ([]byte, error) {
@@ -159,7 +152,7 @@ func CopyFile(dstName, srcName string) error {
 		return err
 	}
 	defer src.Close()
-	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0644)
+	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -182,14 +175,14 @@ func IsDir(s string) bool {
 	return info.IsDir()
 }
 
-type fileInfo struct {
+type FileInfo struct {
 	Name  string
 	Mtime int64
 }
 
-// 递归获取当前目录下的所有文件
-func GetAllFile(pathname string) ([]fileInfo, error) {
-	result := []fileInfo{}
+//递归获取当前目录下的所有文件
+func GetAllFile(pathname string) ([]FileInfo, error) {
+	result := []FileInfo{}
 
 	fis, err := ioutil.ReadDir(pathname)
 	if err != nil {
@@ -209,10 +202,64 @@ func GetAllFile(pathname string) ([]fileInfo, error) {
 			}
 			result = append(result, temp...)
 		} else {
-			fileStruct := fileInfo{Name: fullname, Mtime: fi.ModTime().Unix()}
+			fileStruct := FileInfo{Name: fullname, Mtime: fi.ModTime().Unix()}
 			result = append(result, fileStruct)
 		}
 	}
-
 	return result, nil
+}
+
+//os.Remove()删除文件和空目录, os.RemoveAll()可以删除非空目录
+//os.Remove(path.Dir(s.LogFilename))
+//os.RemoveAll(path.Dir(s.LogFilename)) 内部实现, 就是遍历和递归操作
+//If the path does not exist, RemoveAll returns nil (no error)
+//删除当前目录下的所有空文件夹
+func DelEmptyDir(path string) error {
+	fis, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	var p string
+	var fs []fs.FileInfo
+	for _, fi := range fis {
+		if fi.IsDir() == false {
+			continue
+		}
+
+		p = path + "/" + fi.Name()
+		fs, err = ioutil.ReadDir(p)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		if len(fs) != 0 {
+			continue
+		}
+
+		err = os.Remove(p)
+		if err != nil {
+			log.Println(err)
+		}
+		log.Printf("rm EmptyDir %s", p)
+	}
+	return nil
+}
+
+//获取某个路径下的所有文件夹名字
+func GetAllDir(path string) ([]string, error) {
+	fis, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Printf("ReadDir() %s fail: err=%v", path, err)
+		return nil, err
+	}
+
+	var pns []string
+	for _, fi := range fis {
+		if fi.IsDir() {
+			pns = append(pns, fi.Name())
+		}
+	}
+	return pns, nil
 }

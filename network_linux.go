@@ -1,11 +1,9 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os/exec"
-	"strconv"
 )
 
 /************************************************************/
@@ -67,6 +65,7 @@ func GetIpOuter(name string) (string, error) {
 // name 表示网卡名, 如: eth0
 // io 表示输入输出, rx 表示输入(接收) tx表示输出(发送)
 // 获取某个时间点网卡接收或发送的数据量, 单位bit
+/*
 func GetNetDataSize(name, io string) (int, error) {
 	s := fmt.Sprintf("cat /sys/class/net/%s/statistics/%s_bytes", name, inout)
 
@@ -85,6 +84,7 @@ func GetNetDataSize(name, io string) (int, error) {
 	// 返回的是字节数 是大B，所以要乘上8 转换为小b
 	return ret * 8, nil
 }
+*/
 
 // 返回值 是 单位时间内网络流量 Mbps
 func GetNetFlowRate(t1, t2, sec int) int {
@@ -99,6 +99,7 @@ func GetNetFlowRate(t1, t2, sec int) int {
 /* 获取网卡带宽 Mb
 /************************************************************/
 // name 表示网卡名, 如: eth0
+/*
 func GetNetBandwidth(name string) error {
 	iface, err := net.Interfaces()
 	if err != nil {
@@ -114,10 +115,11 @@ func GetNetBandwidth(name string) error {
 		addrs, _ := v.Addrs()
 		for _, addr := range addrs {
 			ipnet, ok := addr.(*net.IPNet)
-			//if ipnet.IP.To4() != nil && ok {
-			log.Printf("name:%s, ip:%s, mac:%s", v.Name, v.HardwareAddr.String(), ni.Mac)
-			//}
+			if ipnet.IP.To4() != nil && ok {
+				log.Printf("name:%s, ip:%s, mac:%s", v.Name, v.HardwareAddr.String(), ni.Mac)
+			}
 		}
 	}
 	return nil
 }
+*/
