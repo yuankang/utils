@@ -3,5 +3,5 @@ package utils
 import "log"
 
 func SayHi() {
-	log.Println("say hi")
+	log.Println("SayHi")
 }
